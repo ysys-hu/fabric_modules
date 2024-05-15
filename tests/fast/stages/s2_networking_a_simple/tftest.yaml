@@ -15,7 +15,8 @@
 module: fast/stages/2-networking-a-simple
 
 tests:
-  peering:
+  # peering (default) is implemented in simple.tfvars
+  simple:
     extra_files:
       - ../../plugins/2-networking-serverless-connector/*.tf
   vpn:

@@ -187,7 +187,7 @@ Connectivity to on-prem is implemented with HA VPN ([`net-vpn`](../../../modules
 
 #### Internal
 
-VPNs ([`net-vpn`](../../../modules/net-vpn-ha)) used to interconnect landing and spokes are managed by `vpn-spoke-*.tf` files, each implementing both sides of the VPN connection. Per-gateway configurations (e.g. BGP advertisements and session ranges) are controlled by variable `vpn_onprem_configs`. VPN gateways and IKE secrets are automatically generated and configured.
+VPNs ([`net-vpn`](../../../modules/net-vpn-ha)) used to interconnect landing and spokes - if enabled in `var.spoke_configs`, are managed by `spoke-vpns.tf` files, each implementing both sides of the VPN connection. Per-gateway configurations (e.g. BGP advertisements and session ranges) are controlled by variable `vpn_onprem_configs`. VPN gateways and IKE secrets are automatically generated and configured.
 
 ### Routing and BGP
 
@@ -195,7 +195,7 @@ Each VPC network ([`net-vpc`](../../../modules/net-vpc)) manages a separate rout
 
 Static routes are defined in `vpc-*.tf` files, in the `routes` section of each `net-vpc` module.
 
-BGP sessions for landing-spoke are configured through variable `vpn_spoke_configs`, while the ones for landing-onprem use variable `vpn_onprem_configs`
+BGP sessions for landing-spoke are configured through variable `spoke_configs.vpn_configs`, while the ones for landing-onprem use variable `vpn_onprem_configs`
 
 ### Firewall
 
@@ -391,14 +391,13 @@ The new VPC requires a set of dedicated CIDRs, one per region, added to variable
 >
 Variables managing L7 Internal Load Balancers (`l7ilb_subnets`) and Private Service Access (`psa_ranges`) should also be adapted, also subnets and firewall rules for the new spoke should be added as described above.
 
-HA VPN connectivity (see also [VPNs](#vpns)) to `landing` is managed by the `vpn-spoke-*.tf` files.
-Copy `vpn-net-dev.tf` to `vpn-net-staging.tf` - replace `dev` with `staging` where relevant.
+Spokes connectivity is managed by `spoke-peerings.tf` for peerings, and `spoke-vpns.tf` for VPNs. Adapt them to ensure that the newly created spokes are connected to landing.
 
 VPN configuration also controls BGP advertisements, which requires the following variable changes:
 
 - `router_configs` to configure the new routers (one per region) created for the `staging` VPC
 - `vpn_onprem_configs` to configure the new advertisements to on-premises for the new CIDRs
-- `vpn_spoke_configs` to configure the new advertisements to `landing` for the new VPC - new keys (one per region) should be added, such as e.g. `staging-ew1` and `staging-ew4`
+- `spoke_configs.vpn_configs` to configure the new advertisements to `landing` for the new VPC - new keys (one per region) should be added, such as e.g. `staging-ew1` and `staging-ew4`
 
 DNS configurations are centralised in the `dns-*.tf` files. Spokes delegate DNS resolution to Landing through DNS peering, and optionally define a private zone (e.g. `dev.gcp.example.com`) which the landing peers to. To configure DNS for a new environment, copy one of the other environments DNS files [e.g. (dns-dev.tf)](dns-dev.tf) into a new `dns-*.tf` file suffixed with the environment name (e.g. `dns-staging.tf`), and update its content accordingly. Don't forget to add a peering zone from the landing to the newly created environment private zone.
 

@@ -121,6 +121,12 @@ variable "environments" {
     ])
     error_message = "Environment names can only contain letters numbers dashes or spaces."
   }
+  validation {
+    condition = alltrue([
+      for k, v in var.environments : (length(coalesce(v.short_name, k)) <= 4)
+    ])
+    error_message = "If environment key is longer than 4 characters, provide short_name that is at most 4 characters long."
+  }
 }
 
 variable "essential_contacts" {
@@ -250,9 +256,9 @@ variable "log_sinks" {
   validation {
     condition = alltrue([
       for k, v in var.log_sinks :
-      contains(["bigquery", "logging", "pubsub", "storage"], v.type)
+      contains(["bigquery", "logging", "project", "pubsub", "storage"], v.type)
     ])
-    error_message = "Type must be one of 'bigquery', 'logging', 'pubsub', 'storage'."
+    error_message = "Type must be one of 'bigquery', 'logging', 'project', 'pubsub', 'storage'."
   }
 }
 
@@ -260,12 +266,8 @@ variable "org_policies_config" {
   description = "Organization policies customization."
   type = object({
     iac_policy_member_domains = optional(list(string))
-    constraints = optional(object({
-      allowed_essential_contact_domains = optional(list(string), [])
-      allowed_policy_member_domains     = optional(list(string), [])
-    }), {})
-    import_defaults = optional(bool, false)
-    tag_name        = optional(string, "org-policies")
+    import_defaults           = optional(bool, false)
+    tag_name                  = optional(string, "org-policies")
     tag_values = optional(map(object({
       description = optional(string, "Managed by the Terraform organization module.")
       iam         = optional(map(list(string)), {})

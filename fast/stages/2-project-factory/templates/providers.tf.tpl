@@ -1,5 +1,5 @@
 /**
- * Copyright 2023 Google LLC
+ * Copyright 2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-output "composer_airflow_uri" {
-  description = "The URI of the Apache Airflow Web UI hosted within the Cloud Composer environment.."
-  value       = google_composer_environment.env.config[0].airflow_uri
-}
+# ${project_id} ${project_number}
 
-output "composer_dag_gcs" {
-  description = "The Cloud Storage prefix of the DAGs for the Cloud Composer environment."
-  value       = google_composer_environment.env.config[0].dag_gcs_prefix
+terraform {
+  backend "gcs" {
+    bucket                      = "${bucket}"
+    impersonate_service_account = "${service_account}"
+  }
 }
-
-output "composer_service_account" {
-  description = "Cloud Composer nodes Service Account email."
-  value       = module.comp-sa.email
+provider "google" {
+  impersonate_service_account = "${service_account}"
+}
+provider "google-beta" {
+  impersonate_service_account = "${service_account}"
 }

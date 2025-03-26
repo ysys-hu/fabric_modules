@@ -16,28 +16,15 @@
 
 locals {
   #TODO(sruffilli): yaml file name should be == project name, unless overridden explicitly by a "name" attribute in project_config.
-  _network_projects = {
+  _projects = {
     for f in local._network_factory_files :
     split(".", f)[0] => yamldecode(file(
       "${coalesce(local._network_factory_path, "-")}/${f}"
     ))
   }
-
-  projects = { for k, v in local._network_projects : k => merge(
-    {
-      billing_account            = try(v.project_config.billing_account, var.billing_account)
-      prefix                     = try(v.project_config.prefix, var.prefix)
-      parent                     = try(v.project_config.parent, var.parent_id)
-      shared_vpc_host_config     = try(v.project_config.shared_vpc_host_config, null)
-      iam                        = try(v.project_config.iam, {})
-      iam_bindings               = try(v.project_config.iam_bindings, {})
-      iam_bindings_additive      = try(v.project_config.iam_bindings_additive, {})
-      iam_by_principals          = try(v.project_config.iam_by_principals, {})
-      iam_by_principals_additive = try(v.project_config.iam_by_principals_additive, {})
-      services                   = try(v.project_config.services, [])
-      org_policies               = try(v.project_config.org_policies, {})
-    },
-    v.project_config)
+  _projects_config = {
+    data_overrides = tomap({})
+    data_defaults  = tomap({})
   }
 }
 

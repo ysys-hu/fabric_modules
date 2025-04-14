@@ -121,6 +121,7 @@ variable "neg_configs" {
       target_urlmask  = optional(string)
     }))
     cloudrun = optional(object({
+      project_id = optional(string)
       region = string
       target_service = optional(object({
         name = string

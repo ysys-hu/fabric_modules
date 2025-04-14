@@ -47,14 +47,8 @@ locals {
   }
   neg_regional_serverless = {
     for k, v in var.neg_configs :
-    k => {
-      cloudrun    = v.cloudrun
-      cloudfunction = v.cloudfunction
-      project_id  = v.project_id
-      description = v.description
-    } if v.cloudrun != null || v.cloudfunction != null
-}
-
+    k => v if v.cloudrun != null || v.cloudfunction != null
+  }
   neg_zonal = {
     # we need to rebuild new objects as we cannot merge different types
     for k, v in var.neg_configs : k => {
@@ -144,7 +138,7 @@ resource "google_compute_region_network_endpoint_group" "psc" {
 
 resource "google_compute_region_network_endpoint_group" "serverless" {
   for_each = local.neg_regional_serverless
-  project = coalesce(each.value.project_id, var.project_id)
+  project  = coalesce(each.value.cloudrun.project_id, var.project_id)
   region = try(
     each.value.cloudrun.region, each.value.cloudfunction.region, null
   )

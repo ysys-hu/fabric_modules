@@ -60,6 +60,10 @@ locals {
       zone        = v.gce != null ? v.gce.zone : v.hybrid.zone
     } if v.gce != null || v.hybrid != null
   }
+  neg_regional = {
+    for k, v in var.neg_configs :
+    k => merge(v.cloudrun, { project_id = v.project_id }) if v.cloudrun != null
+  }
 }
 
 
@@ -138,7 +142,11 @@ resource "google_compute_region_network_endpoint_group" "psc" {
 
 resource "google_compute_region_network_endpoint_group" "serverless" {
   for_each = local.neg_regional_serverless
-  project  = var.project_id
+  project = (
+    each.value.project_id == null
+    ? var.project_id
+    : each.value.project_id
+  )
   region = try(
     each.value.cloudrun.region, each.value.cloudfunction.region, null
   )

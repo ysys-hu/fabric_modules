@@ -47,7 +47,7 @@ locals {
   }
   neg_regional_serverless = {
     for k, v in var.neg_configs :
-    k => v if v.cloudrun != null || v.cloudfunction != null
+    k => merge(v.cloudrun, { project_id = v.project_id }) if v.cloudrun != null
   }
   neg_zonal = {
     # we need to rebuild new objects as we cannot merge different types
@@ -59,10 +59,6 @@ locals {
       type        = v.gce != null ? "GCE_VM_IP_PORT" : "NON_GCP_PRIVATE_IP_PORT"
       zone        = v.gce != null ? v.gce.zone : v.hybrid.zone
     } if v.gce != null || v.hybrid != null
-  }
-  neg_regional = {
-    for k, v in var.neg_configs :
-    k => merge(v.cloudrun, { project_id = v.project_id }) if v.cloudrun != null
   }
 }
 

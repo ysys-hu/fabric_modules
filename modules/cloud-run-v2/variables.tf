@@ -1,5 +1,5 @@
 /**
- * Copyright 2023 Google LLC
+ * Copyright 2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -139,6 +139,12 @@ variable "ingress" {
   }
 }
 
+variable "invoker_iam_disabled" {
+  description = "Disables IAM permission check for run.routes.invoke for callers of this service."
+  type        = bool
+  default     = false
+}
+
 variable "labels" {
   description = "Resource labels."
   type        = map(string)
@@ -160,6 +166,13 @@ variable "launch_stage" {
     BETA, GA, DEPRECATED.
     EOF
   }
+}
+
+variable "managed_revision" {
+  description = "Whether the Terraform module should control the deployment of revisions."
+  type        = bool
+  nullable    = false
+  default     = true
 }
 
 variable "name" {

@@ -17,10 +17,11 @@
 variable "containers" {
   description = "Containers in name => attributes format."
   type = map(object({
-    image   = string
-    command = optional(list(string))
-    args    = optional(list(string))
-    env     = optional(map(string))
+    image      = string
+    depends_on = optional(list(string))
+    command    = optional(list(string))
+    args       = optional(list(string))
+    env        = optional(map(string))
     env_from_key = optional(map(object({
       secret  = string
       version = string
@@ -33,6 +34,7 @@ variable "containers" {
       http_get = optional(object({
         http_headers = optional(map(string))
         path         = optional(string)
+        port         = optional(number)
       }))
       failure_threshold     = optional(number)
       initial_delay_seconds = optional(number)
@@ -59,6 +61,7 @@ variable "containers" {
       http_get = optional(object({
         http_headers = optional(map(string))
         path         = optional(string)
+        port         = optional(number)
       }))
       tcp_socket = optional(object({
         port = optional(number)
@@ -203,6 +206,7 @@ variable "region" {
 variable "revision" {
   description = "Revision template configurations."
   type = object({
+    labels                     = optional(map(string))
     name                       = optional(string)
     gen2_execution_environment = optional(bool)
     max_concurrency            = optional(number)

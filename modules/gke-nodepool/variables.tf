@@ -75,7 +75,7 @@ variable "network_config" {
       network    = string
       subnetwork = string
     })), [])
-    additional_pod_network_config = optional(list(object({
+    additional_pod_network_configs = optional(list(object({
       subnetwork          = string
       secondary_pod_range = string
       max_pods_per_node   = string
@@ -191,6 +191,15 @@ variable "nodepool_config" {
     upgrade_settings = optional(object({
       max_surge       = number
       max_unavailable = number
+      strategy        = optional(string)
+      blue_green_settings = optional(object({
+        node_pool_soak_duration = optional(string)
+        standard_rollout_policy = optional(object({
+          batch_percentage    = optional(number)
+          batch_node_count    = optional(number)
+          batch_soak_duration = optional(string)
+        }))
+      }))
     }))
   })
   default = null

@@ -47,6 +47,12 @@ variable "custom_roles" {
   nullable    = false
 }
 
+variable "default_network_tier" {
+  description = "Default compute network tier for the project."
+  type        = string
+  default     = null
+}
+
 variable "default_service_account" {
   description = "Project default service account setting: can be one of `delete`, `deprivilege`, `disable`, or `keep`."
   default     = "keep"
@@ -220,7 +226,8 @@ variable "shared_vpc_host_config" {
     enabled          = bool
     service_projects = optional(list(string), [])
   })
-  default = null
+  nullable = true
+  default  = null
 }
 
 variable "shared_vpc_service_config" {

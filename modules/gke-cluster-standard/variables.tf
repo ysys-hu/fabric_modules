@@ -19,15 +19,17 @@ variable "access_config" {
   type = object({
     dns_access = optional(bool, true)
     ip_access = optional(object({
-      authorized_ranges               = optional(map(string), {})
-      disable_public_endpoint         = optional(bool, true)
-      gcp_public_cidrs_access_enabled = optional(bool, false)
+      authorized_ranges                              = optional(map(string))
+      disable_public_endpoint                        = optional(bool)
+      gcp_public_cidrs_access_enabled                = optional(bool)
+      private_endpoint_authorized_ranges_enforcement = optional(bool)
       private_endpoint_config = optional(object({
         endpoint_subnetwork = optional(string)
         global_access       = optional(bool, true)
-      }), {})
+      }))
     }))
-    private_nodes = optional(bool, true)
+    master_ipv4_cidr_block = optional(string)
+    private_nodes          = optional(bool, true)
   })
   nullable = false
   default  = {}
@@ -98,6 +100,7 @@ variable "cluster_autoscaling" {
       }))
       # add validation rule to ensure only one is present if upgrade settings is defined
     }))
+    auto_provisioning_locations = optional(list(string))
     cpu_limits = optional(object({
       min = optional(number, 0)
       max = number
@@ -207,6 +210,7 @@ variable "enable_features" {
       scope                         = optional(string)
       domain                        = optional(string)
     }))
+    multi_networking = optional(bool, false)
     database_encryption = optional(object({
       state    = string
       key_name = string
@@ -391,6 +395,7 @@ variable "node_config" {
     service_account               = optional(string)
     tags                          = optional(list(string))
     workload_metadata_config_mode = optional(string)
+    kubelet_readonly_port_enabled = optional(bool, true)
   })
   default  = {}
   nullable = false

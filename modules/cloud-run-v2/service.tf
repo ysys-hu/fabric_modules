@@ -30,6 +30,7 @@ resource "google_cloud_run_v2_service" "service" {
   launch_stage         = var.launch_stage
   custom_audiences     = var.custom_audiences
   deletion_protection  = var.deletion_protection
+  iap_enabled          = var.iap_enabled
 
   template {
     labels         = var.revision.labels

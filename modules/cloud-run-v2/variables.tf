@@ -336,8 +336,3 @@ variable "volumes" {
     error_message = "Only one type of volume can be defined at a time."
   }
 }
-variable "iap_enabled" {
-  description = "Enable IAP for this service."
-  type        = bool
-  default     = false
-}

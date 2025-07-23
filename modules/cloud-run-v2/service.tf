@@ -30,7 +30,7 @@ resource "google_cloud_run_v2_service" "service" {
   launch_stage         = var.launch_stage
   custom_audiences     = var.custom_audiences
   deletion_protection  = var.deletion_protection
-  iap_enabled          = var.iap_enabled
+  iap_enabled          = local.iap_enabled
 
   template {
     labels         = var.revision.labels
@@ -277,7 +277,7 @@ resource "google_cloud_run_v2_service" "service_unmanaged" {
   launch_stage         = var.launch_stage
   custom_audiences     = var.custom_audiences
   deletion_protection  = var.deletion_protection
-  iap_enabled          = var.iap_enabled
+  iap_enabled          = local.iap_enabled
 
   template {
     labels         = var.revision.labels
@@ -505,7 +505,8 @@ resource "google_cloud_run_v2_service" "service_unmanaged" {
       client,
       client_version,
       template[0].annotations["run.googleapis.com/operation-id"],
-      template[0].containers
+      template[0].containers,
+      template[0].labels
     ]
   }
 }
@@ -527,25 +528,14 @@ resource "google_cloud_run_v2_service_iam_binding" "binding" {
 }
 
 locals {
-  use_iap_member = (
-    !var.create_job &&
-    var.iap_http_resource_accessors_config != null &&
-    !var.iap_http_resource_accessors_config.authoritative_mode
-  )
 
-  iap_member_list = local.use_iap_member ? toset(var.iap_http_resource_accessors_config.iam_emails) : []
-
-  use_iap_iam_binding = (
-    !var.create_job &&
-    var.iap_http_resource_accessors_config != null &&
-    var.iap_http_resource_accessors_config.authoritative_mode
-  )
-  iap_binding_dict = local.use_iap_iam_binding ? { "iap" = var.iap_http_resource_accessors_config.iam_emails } : {}
+  iap_iam_additive = local.iap_enabled ? var.iap_config.iam_additive : []
+  iap_iam          = local.iap_enabled ? var.iap_config.iam : []
 
 }
 
 resource "google_iap_web_cloud_run_service_iam_member" "member" {
-  for_each               = local.iap_member_list
+  for_each               = toset(local.iap_iam_additive)
   project                = local.service.project
   location               = local.service.location
   cloud_run_service_name = local.service.name
@@ -554,10 +544,10 @@ resource "google_iap_web_cloud_run_service_iam_member" "member" {
 }
 
 resource "google_iap_web_cloud_run_service_iam_binding" "binding" {
-  for_each               = local.iap_binding_dict
+  for_each               = length(local.iap_iam) == 0 ? {} : { 1 = 1 }
   project                = local.service.project
   location               = local.service.location
   cloud_run_service_name = local.service.name
   role                   = "roles/iap.httpsResourceAccessor"
-  members                = each.value
+  members                = local.iap_iam
 }

@@ -89,8 +89,11 @@ resource "google_container_cluster" "cluster" {
     }
   }
   node_pool_auto_config {
-    network_tags {
-      tags = var.node_pool_auto_config.network_tags
+    dynamic "network_tags" {
+      for_each = var.node_pool_auto_config.network_tags == tolist([]) ? [1] : []
+      content {
+        tags = var.node_pool_auto_config.network_tags
+      }
     }
     resource_manager_tags = var.node_pool_auto_config.resource_manager_tags
     node_kubelet_config {

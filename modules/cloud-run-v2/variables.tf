@@ -194,6 +194,10 @@ variable "launch_stage" {
     BETA, GA, DEPRECATED.
     EOF
   }
+  validation {
+    condition     = !var.iap_enabled || (var.iap_enabled && var.launch_stage == "BETA")
+    error_message = "When IAP is enabled (iap_enabled = true), launch_stage must be set to 'BETA'."
+  }
 }
 
 variable "managed_revision" {

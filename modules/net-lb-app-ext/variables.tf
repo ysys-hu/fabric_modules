@@ -167,7 +167,6 @@ variable "neg_configs" {
       network        = optional(string)
       subnetwork     = optional(string)
     }))
-    project_id = optional(string, null)
   }))
   default  = {}
   nullable = false

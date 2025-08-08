@@ -249,7 +249,7 @@
           }
         }
       }
-     },
+    },
     "parent": {
       "type": "string"
     },
@@ -263,7 +263,7 @@
         "use_data_source": {
           "type": "boolean"
         },
-        "project_attributes": {
+        "attributes": {
           "type": "object",
           "required": [
             "name",
@@ -616,7 +616,7 @@
             },
             "role": {
               "type": "string",
-              "pattern": "^[a-zA-Z0-9_/]+$"
+              "pattern": "^[a-zA-Z0-9_/.]+$"
             },
             "condition": {
               "type": "object",

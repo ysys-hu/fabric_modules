@@ -73,7 +73,7 @@
 - **project_reuse**: *object*
   <br>*additional properties: false*
   - **use_data_source**: *boolean*
-  - **project_attributes**: *object*
+  - **attributes**: *object*
     - ⁺**name**: *string*
     - ⁺**number**: *number*
     - **services_enabled**: *array*
@@ -173,7 +173,7 @@
     - **member**: *string*
       <br>*pattern: ^(?:domain:|group:|serviceAccount:|user:|principal:|principalSet:|[a-z])*
     - **role**: *string*
-      <br>*pattern: ^[a-zA-Z0-9_/]+$*
+      <br>*pattern: ^[a-zA-Z0-9_/.]+$*
     - **condition**: *object*
       <br>*additional properties: false*
       - ⁺**expression**: *string*

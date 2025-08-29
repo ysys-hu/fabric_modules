@@ -129,8 +129,6 @@ values:
     node_pool_auto_config:
     - linux_node_config:
       - {}
-      network_tags:
-      - tags: []
       node_kubelet_config:
       - insecure_kubelet_readonly_port_enabled: 'TRUE'
       resource_manager_tags: null

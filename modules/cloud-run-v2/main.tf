@@ -1,5 +1,5 @@
 /**
- * Copyright 2023 Google LLC
+ * Copyright 2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,19 @@ locals {
     )
     : var.service_account
   )
+  service = (
+    var.create_job
+    ? (
+      var.managed_revision
+      ? google_cloud_run_v2_job.job[0]
+      : google_cloud_run_v2_job.job_unmanaged[0]
+    )
+    : (
+      var.managed_revision
+      ? google_cloud_run_v2_service.service[0]
+      : google_cloud_run_v2_service.service_unmanaged[0]
+    )
+  )
   trigger_sa_create = try(
     var.eventarc_triggers.service_account_create, false
   )
@@ -41,6 +54,8 @@ locals {
     var.eventarc_triggers.service_account_email,
     null
   )
+
+  iap_enabled = var.iap_config != null
 }
 
 resource "google_cloud_run_v2_service_iam_member" "default" {
@@ -108,6 +123,29 @@ resource "google_eventarc_trigger" "pubsub_triggers" {
     cloud_run_service {
       service = google_cloud_run_v2_service.service[0].name
       region  = google_cloud_run_v2_service.service[0].location
+    }
+  }
+  service_account = local.trigger_sa_email
+}
+
+resource "google_eventarc_trigger" "storage_triggers" {
+  for_each = coalesce(var.eventarc_triggers.storage, tomap({}))
+  name     = "${local.prefix}storage-${each.key}"
+  location = google_cloud_run_v2_service.service[0].location
+  project  = google_cloud_run_v2_service.service[0].project
+  matching_criteria {
+    attribute = "type"
+    value     = "google.cloud.storage.object.v1.finalized"
+  }
+  matching_criteria {
+    attribute = "bucket"
+    value     = each.value.bucket
+  }
+  destination {
+    cloud_run_service {
+      service = google_cloud_run_v2_service.service[0].name
+      region  = google_cloud_run_v2_service.service[0].location
+      path    = try(each.value.path, null)
     }
   }
   service_account = local.trigger_sa_email

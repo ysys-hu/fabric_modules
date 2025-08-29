@@ -1,5 +1,5 @@
 /**
- * Copyright 2024 Google LLC
+ * Copyright 2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,17 +21,25 @@ locals {
 }
 
 resource "google_artifact_registry_repository" "registry" {
-  provider      = google-beta
-  project       = var.project_id
-  location      = var.location
-  description   = var.description
-  format        = upper(local.format_string)
-  labels        = var.labels
-  repository_id = var.name
-  mode          = "${upper(local.mode_string)}_REPOSITORY"
-  kms_key_name  = var.encryption_key
-
+  provider               = google-beta
+  project                = var.project_id
+  location               = var.location
+  description            = var.description
+  format                 = upper(local.format_string)
+  labels                 = var.labels
+  repository_id          = var.name
+  mode                   = "${upper(local.mode_string)}_REPOSITORY"
+  kms_key_name           = var.encryption_key
   cleanup_policy_dry_run = var.cleanup_policy_dry_run
+
+  vulnerability_scanning_config {
+    enablement_config = (
+      var.enable_vulnerability_scanning == true
+      ? "INHERITED"
+      : var.enable_vulnerability_scanning == false ? "DISABLED" : null
+    )
+  }
+
   dynamic "cleanup_policies" {
     for_each = var.cleanup_policies == null ? {} : var.cleanup_policies
     content {
@@ -208,4 +216,11 @@ resource "google_artifact_registry_repository" "registry" {
     }
   }
 
+}
+
+resource "google_tags_location_tag_binding" "binding" {
+  for_each  = var.tag_bindings
+  parent    = "//artifactregistry.googleapis.com/${google_artifact_registry_repository.registry.id}"
+  location  = var.location
+  tag_value = each.value
 }

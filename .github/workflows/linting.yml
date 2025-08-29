@@ -39,7 +39,7 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.10.2
+          terraform_version: 1.11.4
 
       - uses: terraform-linters/setup-tflint@v4
         name: Setup TFLint
@@ -95,12 +95,8 @@ jobs:
         run: |
           yapf -p -d -r \
             tools/*.py \
-            blueprints
-
-      - name: Check blueprint metadata
-        id: metadata
-        run: |
-          python tools/validate_metadata.py -v --failed-only blueprints
+            blueprints \
+            fast
 
       - name: Check modules versions
         id: versions
@@ -120,3 +116,8 @@ jobs:
           diff -rub /tmp/versions.tf /tmp/versions.tofu
           DIFF_EC=$?
           [[ "${DIFF_EC}" -eq "0" ||  -z "${OUTPUT_TF}" || -z "${OUTPUT_TOFU}" ]]
+
+      - name: Check for diverging files
+        id: duplicates
+        run: |
+          python3 tools/duplicate-diff.py

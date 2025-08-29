@@ -19,14 +19,17 @@ variable "access_config" {
   type = object({
     dns_access = optional(bool, true)
     ip_access = optional(object({
-      authorized_ranges       = optional(map(string), {})
-      disable_public_endpoint = optional(bool, true)
+      authorized_ranges                              = optional(map(string))
+      disable_public_endpoint                        = optional(bool)
+      gcp_public_cidrs_access_enabled                = optional(bool)
+      private_endpoint_authorized_ranges_enforcement = optional(bool)
       private_endpoint_config = optional(object({
         endpoint_subnetwork = optional(string)
         global_access       = optional(bool, true)
-      }), {})
-    }), {})
-    private_nodes = optional(bool, true)
+      }))
+    }))
+    private_nodes          = optional(bool, true)
+    master_ipv4_cidr_block = optional(string)
   })
   nullable = false
   default  = {}
@@ -94,10 +97,12 @@ variable "enable_features" {
     binary_authorization = optional(bool, false)
     cost_management      = optional(bool, true)
     dns = optional(object({
-      provider = optional(string)
-      scope    = optional(string)
-      domain   = optional(string)
+      additive_vpc_scope_dns_domain = optional(string)
+      provider                      = optional(string)
+      scope                         = optional(string)
+      domain                        = optional(string)
     }))
+    multi_networking = optional(bool, false)
     database_encryption = optional(object({
       state    = string
       key_name = string
@@ -232,6 +237,7 @@ variable "node_config" {
     service_account               = optional(string)
     tags                          = optional(list(string))
     workload_metadata_config_mode = optional(string)
+    kubelet_readonly_port_enabled = optional(bool, true)
   })
   default  = {}
   nullable = false

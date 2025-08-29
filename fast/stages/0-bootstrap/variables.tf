@@ -19,8 +19,9 @@ variable "billing_account" {
   type = object({
     id = string
     force_create = optional(object({
-      dataset = optional(bool, false)
-      project = optional(bool, false)
+      dataset    = optional(bool, false)
+      project    = optional(bool, false)
+      log_bucket = optional(bool, false)
     }), {})
     is_org_level = optional(bool, true)
     no_iam       = optional(bool, false)
@@ -155,6 +156,7 @@ variable "groups" {
     gcp-devops              = optional(string, "gcp-devops")
     gcp-network-admins      = optional(string, "gcp-vpc-network-admins")
     gcp-organization-admins = optional(string, "gcp-organization-admins")
+    gcp-secops-admins       = optional(string, "gcp-security-admins")
     gcp-security-admins     = optional(string, "gcp-security-admins")
     # aliased to gcp-devops as the checklist does not create it
     gcp-support = optional(string, "gcp-devops")

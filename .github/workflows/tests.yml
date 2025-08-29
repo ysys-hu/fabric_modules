@@ -27,7 +27,7 @@ on:
       terraform_version:
         description: "Use '1.5.7' to test last MPLv2 Terraform version"
         required: true
-        default: 1.10.2
+        default: 1.11.4
         type: string
 
 env:
@@ -37,7 +37,7 @@ env:
   TF_PLUGIN_CACHE_DIR: "/home/runner/.terraform.d/plugin-cache"
   TFTEST_COPY: 1
   DEFAULT_TERRAFORM_FLAVOUR: terraform
-  DEFAULT_TERRAFORM_VERSION: ${{ inputs.terraform_version || '1.10.2' }}
+  DEFAULT_TERRAFORM_VERSION: ${{ inputs.terraform_version || '1.11.4' }}
   DEFAULT_TOFU_VERSION: "1.9.0"
 
 jobs:
@@ -83,7 +83,7 @@ jobs:
           mkdir -p ${{ env.TF_PLUGIN_CACHE_DIR }}
           echo 'plugin_cache_dir = "${{ env.TF_PLUGIN_CACHE_DIR }}"' | tee -a /home/runner/.terraformrc
           echo 'disable_checkpoint = true' | tee -a /home/runner/.terraformrc
-          sed -i -e 's/>=\(.*# tftest\)/=\1/g'  tools/lockfile/versions.tf
+          sed -i -e 's/>=\(.*# tftest\)/=\1/g' tools/lockfile/versions.tf tools/lockfile/versions.tofu
 
           # change terraform version to the one that is running
           sed -i 's/required_version = .*$/required_version = ">= ${{ matrix.version }}"/g' tools/lockfile/versions.tf

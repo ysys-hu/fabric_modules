@@ -154,7 +154,8 @@ module "project" {
   billing_account = local.billing_account
   services        = [
     "container.googleapis.com",
-    "stackdriver.googleapis.com",
+    "logging.googleapis.com",
+    "monitoring.googleapis.com",
     "storage.googleapis.com",
   ]
   iam = {
@@ -632,6 +633,8 @@ Once you have created and activated a virtual environment, install the dependenc
 pip install -r tests/requirements.txt
 pip install -r tools/requirements.txt
 ```
+
+Some of our tools declare their dependencies in a [PEP 723-style](https://peps.python.org/pep-0723/) format, allowing you to execute them directly with `uv run`. For instance, `tools/tfdoc.py` includes its dependencies inline. As a result, when you run `uv run tools/tfdoc.py`, `uv` will automatically download the necessary dependencies for you.
 
 #### Automated checks on PRs
 

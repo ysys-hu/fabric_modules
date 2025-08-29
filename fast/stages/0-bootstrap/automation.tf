@@ -140,18 +140,20 @@ module "automation-project" {
       "cloudkms.googleapis.com",
       "cloudquotas.googleapis.com",
       "cloudresourcemanager.googleapis.com",
+      "datacatalog.googleapis.com",
       "essentialcontacts.googleapis.com",
       "iam.googleapis.com",
       "iamcredentials.googleapis.com",
+      "logging.googleapis.com",
+      "monitoring.googleapis.com",
       "networksecurity.googleapis.com",
       "orgpolicy.googleapis.com",
       "pubsub.googleapis.com",
       "servicenetworking.googleapis.com",
       "serviceusage.googleapis.com",
-      "stackdriver.googleapis.com",
       "storage-component.googleapis.com",
       "storage.googleapis.com",
-      "sts.googleapis.com"
+      "sts.googleapis.com",
     ],
     # enable specific service only after org policies have been applied
     var.bootstrap_user != null ? [] : [

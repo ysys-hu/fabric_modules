@@ -28,18 +28,14 @@ folder_config:
       - roles/viewer
       - roles/resourcemanager.folderViewer
       - roles/resourcemanager.tagViewer
-    project-factory-rw:
-      - roles/cloudkms.cryptoKeyEncrypterDecrypter
     project-factory-ro:
-      - roles/cloudkms.viewer
-      - project_iam_viewer
+      - kms_key_viewer
     gcp-security-admins:
       - roles/editor
-
   # project factory delegated IAM grant
   iam_bindings:
     project_factory:
-      role: roles/resourcemanager.projectIamAdmin
+      role: kms_key_encryption_admin
       members:
         - project-factory-rw
       condition:
@@ -53,3 +49,13 @@ organization_config:
     sa_sec_cloudasset:
       member: rw
       role: roles/cloudasset.viewer
+# example configuration for stage 3s needing environment-level conditional grants
+# stage3_config:
+  # iam_admin_delegated:
+  #   - environment: dev
+  #     principal: data-platform-dev-rw
+  # iam_viewer:
+  #   - environment: dev
+  #     principal: data-platform-dev-ro
+  #   - environment: dev
+  #     principal: data-platform-dev-rw

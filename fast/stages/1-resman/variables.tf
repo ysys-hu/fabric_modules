@@ -22,7 +22,14 @@ variable "factories_config" {
   type = object({
     stage_2           = optional(string, "data/stage-2")
     stage_3           = optional(string, "data/stage-3")
+    tags              = optional(string, "data/tags")
     top_level_folders = optional(string, "data/top-level-folders")
+    context = optional(object({
+      iam_principals = optional(map(string), {})
+      org_policies   = optional(map(map(string)), {})
+      tag_keys       = optional(map(string), {})
+      tag_values     = optional(map(string), {})
+    }), {})
   })
   nullable = false
   default  = {}
@@ -73,6 +80,7 @@ variable "tags" {
   type = map(object({
     description = optional(string, "Managed by the Terraform organization module.")
     iam         = optional(map(list(string)), {})
+    id          = optional(string)
     values = optional(map(object({
       description = optional(string, "Managed by the Terraform organization module.")
       iam         = optional(map(list(string)), {})

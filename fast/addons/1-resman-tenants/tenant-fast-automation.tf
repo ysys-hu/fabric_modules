@@ -61,23 +61,24 @@ module "tenant-automation-project" {
     "billingbudgets.googleapis.com",
     "cloudasset.googleapis.com",
     "cloudbilling.googleapis.com",
+    "cloudbuild.googleapis.com",
     "cloudkms.googleapis.com",
     "cloudquotas.googleapis.com",
     "cloudresourcemanager.googleapis.com",
+    "compute.googleapis.com",
+    "container.googleapis.com",
     "essentialcontacts.googleapis.com",
     "iam.googleapis.com",
     "iamcredentials.googleapis.com",
+    "logging.googleapis.com",
+    "monitoring.googleapis.com",
     "orgpolicy.googleapis.com",
     "pubsub.googleapis.com",
     "servicenetworking.googleapis.com",
     "serviceusage.googleapis.com",
-    "stackdriver.googleapis.com",
     "storage-component.googleapis.com",
     "storage.googleapis.com",
     "sts.googleapis.com",
-    "cloudbuild.googleapis.com",
-    "compute.googleapis.com",
-    "container.googleapis.com",
   ]
   logging_data_access = {
     "iam.googleapis.com" = {
@@ -93,7 +94,7 @@ module "tenant-automation-project-iam" {
   name     = module.tenant-automation-project[each.key].project_id
   project_reuse = {
     use_data_source = false
-    project_attributes = {
+    attributes = {
       name   = module.tenant-automation-project[each.key].name
       number = module.tenant-automation-project[each.key].number
     }

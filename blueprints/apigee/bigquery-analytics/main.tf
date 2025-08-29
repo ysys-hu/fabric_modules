@@ -32,8 +32,8 @@ module "project" {
     "cloudbuild.googleapis.com",
     "cloudfunctions.googleapis.com",
     "cloudscheduler.googleapis.com",
-    "logging.googleapis.com",
     "compute.googleapis.com",
+    "logging.googleapis.com",
     "pubsub.googleapis.com",
     "servicenetworking.googleapis.com",
     "storage.googleapis.com"
@@ -59,7 +59,7 @@ module "vpc" {
   source     = "../../../modules/net-vpc"
   project_id = module.project.project_id
   name       = var.organization.authorized_network
-  vpc_create = var.vpc_create
+  vpc_reuse  = var.vpc_reuse
   subnets_psc = [for k, v in var.psc_config : {
     ip_cidr_range = v
     name          = "subnet-psc-${k}"

@@ -33,6 +33,9 @@ module "projects" {
   }
   factories_config = merge(var.factories_config, {
     context = {
+      custom_roles = merge(
+        var.custom_roles, var.factories_config.context.custom_roles
+      )
       folder_ids = merge(
         { for k, v in var.folder_ids : k => v if v != null },
         var.factories_config.context.folder_ids
@@ -45,7 +48,16 @@ module "projects" {
         var.groups,
         var.factories_config.context.iam_principals
       )
+      kms_keys = merge(
+        var.kms_keys,
+        var.factories_config.context.kms_keys
+      )
+      perimeters = var.perimeters
       tag_values = merge(
+        {
+          for k, v in var.org_policy_tags.values :
+          "${var.org_policy_tags.key_name}/${k}" => v
+        },
         var.tag_values,
         var.factories_config.context.tag_values
       )

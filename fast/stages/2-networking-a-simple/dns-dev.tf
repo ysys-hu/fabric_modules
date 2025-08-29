@@ -20,10 +20,11 @@
 
 module "dev-dns-priv-example" {
   source     = "../../../modules/dns"
+  count      = var.dns.gcp_domain != null ? 1 : 0
   project_id = module.dev-spoke-project.project_id
-  name       = "dev-gcp-example-com"
+  name       = "dev-${replace(var.dns.gcp_domain, ".", "-")}"
   zone_config = {
-    domain = "dev.gcp.example.com."
+    domain = "dev.${var.dns.gcp_domain}."
     private = {
       client_networks = [module.landing-vpc.self_link]
     }

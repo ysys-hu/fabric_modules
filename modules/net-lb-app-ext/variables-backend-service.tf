@@ -19,6 +19,8 @@
 variable "backend_service_configs" {
   description = "Backend service level configuration."
   type = map(object({
+    name                            = optional(string)
+    description                     = optional(string, "Terraform managed.")
     affinity_cookie_ttl_sec         = optional(number)
     compression_mode                = optional(string)
     connection_draining_timeout_sec = optional(number)
@@ -37,6 +39,7 @@ variable "backend_service_configs" {
     backends = list(object({
       # group renamed to backend
       backend         = string
+      preferred       = optional(bool, false)
       balancing_mode  = optional(string, "UTILIZATION")
       capacity_scaler = optional(number, 1)
       description     = optional(string, "Terraform managed.")
@@ -98,8 +101,8 @@ variable "backend_service_configs" {
       }))
     }))
     iap_config = optional(object({
-      oauth2_client_id            = string
-      oauth2_client_secret        = string
+      oauth2_client_id            = optional(string)
+      oauth2_client_secret        = optional(string)
       oauth2_client_secret_sha256 = optional(string)
     }))
     locality_lb_policies = optional(list(object({
@@ -147,7 +150,9 @@ variable "backend_service_configs" {
       for backend_service in values(var.backend_service_configs) : contains(
         [
           "NONE", "CLIENT_IP", "CLIENT_IP_NO_DESTINATION",
-          "CLIENT_IP_PORT_PROTO", "CLIENT_IP_PROTO"
+          "CLIENT_IP_PORT_PROTO", "CLIENT_IP_PROTO",
+          "GENERATED_COOKIE", "HEADER_FIELD", "HTTP_COOKIE",
+          "STRONG_COOKIE_AFFINITY"
         ],
         coalesce(backend_service.session_affinity, "NONE")
       )

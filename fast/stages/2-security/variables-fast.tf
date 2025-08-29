@@ -35,15 +35,6 @@ variable "billing_account" {
   }
 }
 
-variable "custom_roles" {
-  # tfdoc:variable:source 0-bootstrap
-  description = "Custom roles defined at the org level, in key => id format."
-  type = object({
-    project_iam_viewer = string
-  })
-  default = null
-}
-
 variable "environments" {
   # tfdoc:variable:source 0-globals
   description = "Environment names."
@@ -82,7 +73,7 @@ variable "prefix" {
   }
 }
 
-variable "stage_config" {
+variable "stage_configs" {
   # tfdoc:variable:source 1-resman
   description = "FAST stage configuration."
   type = object({

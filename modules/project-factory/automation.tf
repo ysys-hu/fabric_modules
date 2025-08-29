@@ -21,7 +21,11 @@ locals {
     for k, v in local.projects :
     k => merge(try(v.automation.bucket, {}), {
       automation_project = v.automation.project
-      prefix             = v.prefix
+      prefix = coalesce(
+        try(v.automation.prefix, null),
+        "${v.prefix}-${v.name}"
+      )
+      project_name = v.name
     }) if try(v.automation.bucket, null) != null
   }
   automation_sa = flatten([
@@ -29,13 +33,17 @@ locals {
       for ks, kv in try(v.automation.service_accounts, {}) : merge(kv, {
         automation_project = v.automation.project
         name               = ks
-        prefix             = v.prefix
-        project            = k
+        prefix = coalesce(
+          try(v.automation.prefix, null),
+          "${v.prefix}-${v.name}"
+        )
+        project      = k
+        project_name = v.name
       })
     ]
   ])
 }
-output "foo" { value = local.automation_buckets }
+
 module "automation-bucket" {
   source   = "../gcs"
   for_each = local.automation_buckets
@@ -43,8 +51,13 @@ module "automation-bucket" {
   # from the IAM dependency in the outputs of the main project
   project_id     = each.value.automation_project
   prefix         = each.value.prefix
-  name           = "${each.key}-tf-state"
+  name           = "tf-state"
   encryption_key = lookup(each.value, "encryption_key", null)
+  force_destroy = try(coalesce(
+    var.data_overrides.bucket.force_destroy,
+    each.value.force_destroy,
+    var.data_defaults.bucket.force_destroy,
+  ), null)
   iam = {
     for k, v in lookup(each.value, "iam", {}) : k => [
       for vv in v : try(
@@ -58,9 +71,20 @@ module "automation-bucket" {
     for k, v in lookup(each.value, "iam_bindings", {}) : k => merge(v, {
       members = [
         for vv in v.members : try(
+          # rw (infer local project and automation prefix)
+          module.automation-service-accounts["${each.key}/automation/${vv}"].iam_email,
+          # automation/rw or sa (infer local project)
           module.automation-service-accounts["${each.key}/${vv}"].iam_email,
+          # project/automation/rw project/sa
           var.factories_config.context.iam_principals[vv],
-          vv
+          # fully specified principal
+          vv,
+          # passthrough + error handling using tonumber until Terraform gets fail/raise function
+          (
+            strcontains(vv, ":")
+            ? vv
+            : tonumber("[Error] Invalid member: '${vv}' in automation bucket '${each.key}'")
+          )
         )
       ]
     })
@@ -94,19 +118,20 @@ module "automation-bucket" {
 module "automation-service-accounts" {
   source = "../iam-service-account"
   for_each = {
-    for k in local.automation_sa : "${k.project}/${k.name}" => k
+    for k in local.automation_sa : "${k.project}/automation/${k.name}" => k
   }
   # we cannot use interpolation here as we would get a cycle
   # from the IAM dependency in the outputs of the main project
   project_id  = each.value.automation_project
   prefix      = each.value.prefix
-  name        = "${each.value.project}-${each.value.name}"
+  name        = each.value.name
   description = lookup(each.value, "description", null)
   display_name = lookup(
     each.value,
     "display_name",
     "Service account ${each.value.name} for ${each.value.project}."
   )
+  # TODO: also support short form for service accounts in this project
   iam = {
     for k, v in lookup(each.value, "iam", {}) : k => [
       for vv in v : lookup(

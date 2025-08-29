@@ -31,6 +31,7 @@ variable "backend_service_config" {
     }))
     log_sample_rate  = optional(number)
     name             = optional(string)
+    description      = optional(string, "Terraform managed.")
     protocol         = optional(string, "UNSPECIFIED")
     session_affinity = optional(string)
     timeout_sec      = optional(number)
@@ -95,7 +96,7 @@ variable "group_configs" {
 }
 
 variable "health_check" {
-  description = "Name of existing health check to use, disables auto-created health check."
+  description = "Name of existing health check to use, disables auto-created health check. Also set `health_check_config = null` when cross-referencing an health check from another load balancer module to avoid a Terraform error."
   type        = string
   default     = null
 }

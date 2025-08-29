@@ -31,11 +31,12 @@ locals {
     "roles/vpcaccess.user",
   ]))
   iam_admin_delegated = try(
-    var.stage_config["networking"].iam_admin_delegated, {}
+    var.stage_configs["networking"].iam_admin_delegated, {}
   )
   iam_viewer = try(
-    var.stage_config["networking"].iam_viewer, {}
+    var.stage_configs["networking"].iam_viewer, {}
   )
+  onprem_domain_map = { for i in var.dns.onprem_domains : i.domain => i }
   # combine all regions from variables and subnets
   regions = distinct(concat(
     values(var.regions),

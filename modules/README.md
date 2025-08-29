@@ -60,6 +60,7 @@ These modules are used in the examples included in this repository. If you are u
 - [NAT](./net-cloudnat)
 - [Service Directory](./service-directory)
 - [VPC](./net-vpc)
+- [VPC factory](./net-vpc-factory)
 - [VPC firewall](./net-vpc-firewall)
 - [VPN dynamic](./net-vpn-dynamic)
 - [VPC peering](./net-vpc-peering)
@@ -91,6 +92,7 @@ These modules are used in the examples included in this repository. If you are u
 - [Dataform Repository](./dataform-repository/)
 - [Datafusion](./datafusion)
 - [Dataplex](./dataplex)
+- [Dataplex Aspect Types](./dataplex-aspect-types/)
 - [Dataplex DataScan](./dataplex-datascan/)
 - [Dataproc](./dataproc)
 - [Firestore](./firestore)
@@ -99,6 +101,10 @@ These modules are used in the examples included in this repository. If you are u
 - [Pub/Sub](./pubsub)
 - [Spanner instance](./spanner-instance)
 
+## AI
+
+- [AI Applications](./ai-applications/README.md)
+
 ## Development
 
 - [API Gateway](./api-gateway)
@@ -106,6 +112,7 @@ These modules are used in the examples included in this repository. If you are u
 - [Artifact Registry](./artifact-registry)
 - [Container Registry](./container-registry)
 - [Cloud Source Repository](./source-repository)
+- [Cloud Deploy](./cloud-deploy)
 - [Secure Source Manager instance](./secure-source-manager-instance)
 - [Workstation cluster](./workstation-cluster)
 

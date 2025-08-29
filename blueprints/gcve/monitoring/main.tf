@@ -36,8 +36,8 @@ module "project" {
   project_reuse   = var.project_create != null ? null : {}
   services = [
     "compute.googleapis.com",
-    "monitoring.googleapis.com",
     "logging.googleapis.com",
+    "monitoring.googleapis.com",
     "secretmanager.googleapis.com"
   ]
   shared_vpc_service_config = !local.use_shared_vpc ? null : {
@@ -66,7 +66,7 @@ module "gcve-mon-template" {
   name            = "gcve-mon-template"
   zone            = var.vm_mon_config.vm_mon_zone
   instance_type   = var.vm_mon_config.vm_mon_type
-  create_template = true
+  create_template = {}
   can_ip_forward  = false
   network_interfaces = [
     {

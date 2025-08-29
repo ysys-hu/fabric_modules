@@ -1,5 +1,5 @@
 /**
- * Copyright 2024 Google LLC
+ * Copyright 2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,6 +56,9 @@ variable "custom_roles" {
   description = "Custom roles defined at the org level, in key => id format."
   type = object({
     billing_viewer                  = string
+    dns_zone_binder                 = string
+    kms_key_encryption_admin        = string
+    kms_key_viewer                  = string
     organization_admin_viewer       = string
     project_iam_viewer              = string
     service_project_network_admin   = string
@@ -96,6 +99,7 @@ variable "groups" {
     gcp-devops              = optional(string, "gcp-devops")
     gcp-network-admins      = optional(string, "gcp-vpc-network-admins")
     gcp-organization-admins = optional(string, "gcp-organization-admins")
+    gcp-secops-admins       = optional(string, "gcp-security-admins")
     gcp-security-admins     = optional(string, "gcp-security-admins")
   })
   nullable = false
@@ -144,6 +148,18 @@ check "prefix_validator" {
     condition     = (try(length(var.prefix), 0) < 10) || (try(length(var.prefix), 0) < 12 && var.root_node != null)
     error_message = "var.prefix must be 9 characters or shorter for organizations, and 11 chars or shorter for tenants."
   }
+}
+
+variable "org_policy_tags" {
+  # tfdoc:variable:source 0-bootstrap
+  description = "Organization policy tags."
+  type = object({
+    key_id   = optional(string)
+    key_name = optional(string, "org-policies")
+    values   = optional(map(string), {})
+  })
+  nullable = false
+  default  = {}
 }
 
 variable "prefix" {

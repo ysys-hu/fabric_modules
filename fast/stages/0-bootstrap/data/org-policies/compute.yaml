@@ -77,9 +77,14 @@ compute.trustedImageProjects:
         - "is:projects/windows-cloud"
         - "is:projects/windows-sql-cloud"
         - "is:projects/confidential-vm-images"
+        - "is:projects/confidential-space-images"
         - "is:projects/backupdr-images"
         - "is:projects/deeplearning-platform-release"
         - "is:projects/serverless-vpc-access-images"
+        - "is:projects/gke-node-images"
+        - "is:projects/gke-windows-node-images"
+        - "is:projects/ubuntu-os-gke-cloud"
+
 
 compute.vmExternalIpAccess:
   rules:
@@ -109,7 +114,7 @@ compute.restrictProtocolForwardingCreationForTypes:
   rules:
     - allow:
         values:
-          - INTERNAL
+          - is:INTERNAL
 
 # compute.restrictSharedVpcHostProjects:
 #   rules:

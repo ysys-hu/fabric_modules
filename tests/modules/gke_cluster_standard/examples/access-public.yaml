@@ -45,12 +45,18 @@ values:
       - enabled: false
     allow_net_admin: null
     binary_authorization: []
+    control_plane_endpoints_config:
+    - dns_endpoint_config:
+      - allow_external_traffic: false
+      ip_endpoints_config:
+      - enabled: true
     cost_management_config:
     - enabled: true
     datapath_provider: ADVANCED_DATAPATH
     default_max_pods_per_node: 32
     deletion_protection: true
     description: null
+    disable_l4_lb_firewall_reconciliation: false
     dns_config: []
     effective_labels:
       environment: dev
@@ -89,6 +95,7 @@ values:
     - cidr_blocks:
       - cidr_block: 8.8.8.8/32
         display_name: corporate proxy
+      gcp_public_cidrs_access_enabled: false
     min_master_version: null
     monitoring_config:
     - enable_components:
@@ -106,6 +113,7 @@ values:
       ephemeral_storage_config: []
       ephemeral_storage_local_ssd_config: []
       fast_socket: []
+      flex_start: null
       gvnic: []
       host_maintenance_policy: []
       linux_node_config: []
@@ -129,6 +137,7 @@ values:
       - containerd_config: []
         gcfs_config:
         - enabled: false
+        insecure_kubelet_readonly_port_enabled: 'TRUE'
     pod_security_policy_config: []
     private_cluster_config: []
     project: myproject

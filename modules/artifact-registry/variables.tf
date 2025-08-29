@@ -47,6 +47,12 @@ variable "description" {
   default     = "Terraform-managed registry"
 }
 
+variable "enable_vulnerability_scanning" {
+  description = "Whether vulnerability scanning should be enabled in the repository."
+  type        = bool
+  default     = null
+}
+
 variable "encryption_key" {
   description = "The KMS key name to use for encryption at rest."
   type        = string
@@ -216,4 +222,11 @@ variable "name" {
 variable "project_id" {
   description = "Registry project id."
   type        = string
+}
+
+variable "tag_bindings" {
+  description = "Tag bindings for this repository, in key => tag value id format."
+  type        = map(string)
+  nullable    = false
+  default     = {}
 }

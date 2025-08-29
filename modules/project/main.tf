@@ -16,12 +16,13 @@
 
 locals {
   # descriptive_name cannot contain colons, so we omit the universe from the default
+  _observability_factory_path = pathexpand(coalesce(var.factories_config.observability, "-"))
   descriptive_name = (
     var.descriptive_name != null ? var.descriptive_name : "${local.prefix}${var.name}"
   )
   observability_factory_data_raw = [
-    for f in try(fileset(var.factories_config.observability, "*.yaml"), []) :
-    yamldecode(file("${var.factories_config.observability}/${f}"))
+    for f in try(fileset(local._observability_factory_path, "*.yaml"), []) :
+    yamldecode(file("${local._observability_factory_path}/${f}"))
   ]
   parent_type = var.parent == null ? null : split("/", var.parent)[0]
   parent_id   = var.parent == null ? null : split("/", var.parent)[1]
@@ -37,8 +38,8 @@ locals {
       try(var.project_reuse.use_data_source, null) == false
       ? {
         project_id = local.project_id
-        number     = try(var.project_reuse.project_attributes.number, null)
-        name       = try(var.project_reuse.project_attributes.name, null)
+        number     = try(var.project_reuse.attributes.number, null)
+        name       = try(var.project_reuse.attributes.name, null)
       }
       : {
         project_id = local.project_id
@@ -122,4 +123,10 @@ resource "google_monitoring_monitored_project" "primary" {
   for_each      = toset(var.metric_scopes)
   metrics_scope = each.value
   name          = local.project.project_id
+}
+
+resource "google_compute_project_default_network_tier" "default_network_tier" {
+  count        = var.default_network_tier == null ? 0 : 1
+  network_tier = var.default_network_tier
+  project      = local.project.project_id
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright 2023 Google LLC
+ * Copyright 2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,11 @@
 variable "containers" {
   description = "Containers in name => attributes format."
   type = map(object({
-    image   = string
-    command = optional(list(string))
-    args    = optional(list(string))
-    env     = optional(map(string))
+    image      = string
+    depends_on = optional(list(string))
+    command    = optional(list(string))
+    args       = optional(list(string))
+    env        = optional(map(string))
     env_from_key = optional(map(object({
       secret  = string
       version = string
@@ -33,6 +34,7 @@ variable "containers" {
       http_get = optional(object({
         http_headers = optional(map(string))
         path         = optional(string)
+        port         = optional(number)
       }))
       failure_threshold     = optional(number)
       initial_delay_seconds = optional(number)
@@ -59,6 +61,7 @@ variable "containers" {
       http_get = optional(object({
         http_headers = optional(map(string))
         path         = optional(string)
+        port         = optional(number)
       }))
       tcp_socket = optional(object({
         port = optional(number)
@@ -105,7 +108,11 @@ variable "eventarc_triggers" {
       method  = string
       service = string
     })))
-    pubsub                 = optional(map(string))
+    pubsub = optional(map(string))
+    storage = optional(map(object({
+      bucket = string
+      path   = optional(string)
+    })))
     service_account_email  = optional(string)
     service_account_create = optional(bool, false)
   })
@@ -120,6 +127,31 @@ variable "iam" {
   description = "IAM bindings for Cloud Run service in {ROLE => [MEMBERS]} format."
   type        = map(list(string))
   default     = {}
+}
+
+variable "iap_config" {
+  description = "If present, turns on Identity-Aware Proxy (IAP) for the Cloud Run service."
+  type = object({
+    iam          = optional(list(string), [])
+    iam_additive = optional(list(string), [])
+  })
+  default = null
+
+  validation {
+    condition = !(length(try(var.iap_config.iam, [])) > 0 && length(try(var.iap_config.iam_additive, [])) > 0)
+
+    error_message = "Providing both 'iam' and 'iam_additive' in iap_config is not supported."
+  }
+
+  validation {
+    condition     = var.iap_config == null || !var.create_job
+    error_message = "IAP is only supported for Cloud Run services, not Cloud Run jobs. Set create_job to false when using iap_config."
+  }
+
+  validation {
+    condition     = var.iap_config == null || var.launch_stage != "GA"
+    error_message = "iap is currently not supported in GA. Set launch_stage to 'BETA' or lower."
+  }
 }
 
 variable "ingress" {
@@ -137,6 +169,12 @@ variable "ingress" {
     INGRESS_TRAFFIC_INTERNAL_LOAD_BALANCER.
     EOF
   }
+}
+
+variable "invoker_iam_disabled" {
+  description = "Disables IAM permission check for run.routes.invoke for callers of this service."
+  type        = bool
+  default     = false
 }
 
 variable "labels" {
@@ -160,6 +198,13 @@ variable "launch_stage" {
     BETA, GA, DEPRECATED.
     EOF
   }
+}
+
+variable "managed_revision" {
+  description = "Whether the Terraform module should control the deployment of revisions."
+  type        = bool
+  nullable    = false
+  default     = true
 }
 
 variable "name" {
@@ -190,6 +235,7 @@ variable "region" {
 variable "revision" {
   description = "Revision template configurations."
   type = object({
+    labels                     = optional(map(string))
     name                       = optional(string)
     gen2_execution_environment = optional(bool)
     max_concurrency            = optional(number)

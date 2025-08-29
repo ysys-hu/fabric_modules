@@ -58,7 +58,7 @@ variable "forwarding_rules_config" {
   description = "The optional forwarding rules configuration."
   type = map(object({
     address     = optional(string)
-    description = optional(string)
+    description = optional(string, "Terraform managed.")
     ipv6        = optional(bool, false)
     name        = optional(string)
     ports       = optional(list(number), null)
@@ -90,6 +90,8 @@ variable "group_configs" {
 variable "https_proxy_config" {
   description = "HTTPS proxy connfiguration."
   type = object({
+    name                             = optional(string)
+    description                      = optional(string, "Terraform managed.")
     certificate_manager_certificates = optional(list(string))
     certificate_map                  = optional(string)
     quic_override                    = optional(string)
@@ -114,6 +116,7 @@ variable "name" {
 variable "neg_configs" {
   description = "Optional network endpoint groups to create. Can be referenced in backends via key or outputs."
   type = map(object({
+    project_id  = optional(string)
     description = optional(string)
     cloudfunction = optional(object({
       region          = string
@@ -229,6 +232,7 @@ variable "ssl_certificates" {
       private_key = string
     })), {})
     managed_configs = optional(map(object({
+      name        = optional(string)
       domains     = list(string)
       description = optional(string)
     })), {})

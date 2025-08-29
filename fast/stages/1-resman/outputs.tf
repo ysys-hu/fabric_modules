@@ -29,7 +29,7 @@ locals {
     local.top_level_service_accounts
   )
   tfvars = {
-    stage_config = merge(
+    stage_configs = merge(
       {
         for k, v in local.stage3 : k => {
           environment = v.environment
@@ -89,6 +89,11 @@ output "providers" {
 output "service_accounts" {
   description = "Service accounts."
   value       = local.service_accounts
+}
+
+output "tag_values" {
+  description = "Tag values."
+  value       = local.tfvars.tag_values
 }
 
 # ready to use variable values for subsequent stages

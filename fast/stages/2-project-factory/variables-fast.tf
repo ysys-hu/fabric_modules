@@ -36,6 +36,14 @@ variable "billing_account" {
   }
 }
 
+variable "custom_roles" {
+  # tfdoc:variable:source 0-bootstrap
+  description = "Custom roles defined at the org level, in key => id format."
+  type        = map(string)
+  nullable    = false
+  default     = {}
+}
+
 variable "folder_ids" {
   # tfdoc:variable:source 1-resman
   description = "Folders created in the resource management stage."
@@ -61,11 +69,38 @@ variable "host_project_ids" {
   default     = {}
 }
 
+variable "kms_keys" {
+  # tfdoc:variable:source 2-security
+  description = "KMS key ids."
+  type        = map(string)
+  nullable    = false
+  default     = {}
+}
+
 variable "locations" {
   # tfdoc:variable:source 0-bootstrap
   description = "Optional locations for GCS, BigQuery, and logging buckets created here."
   type = object({
     gcs = optional(string)
+  })
+  nullable = false
+  default  = {}
+}
+
+variable "perimeters" {
+  # tfdoc:variable:source 1-vpcsc
+  description = "Optional VPC-SC perimeter ids."
+  type        = map(string)
+  nullable    = false
+  default     = {}
+}
+
+variable "org_policy_tags" {
+  # tfdoc:variable:source 0-bootstrap
+  description = "Optional organization policy tag values."
+  type = object({
+    key_name = optional(string, "org-policies")
+    values   = optional(map(string), {})
   })
   nullable = false
   default  = {}

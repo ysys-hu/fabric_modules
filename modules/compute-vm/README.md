@@ -209,7 +209,7 @@ module "vm-disks-example" {
   }
   create_template = true
 }
-# tftest modules=1 resources=2
+# tftest inventory=disks-sources-template.yaml
 ```
 
 #### Disk types and options
